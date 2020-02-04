@@ -1,0 +1,69 @@
+<% data_path = './' + config.G5_DATA_DIR
+  if(!title) title = G5_VERSION + ' 설치' %>
+
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="src/css/install/install.css">
+</head>
+<body>
+  <div id="ins_bar">
+    <span id="bar_img">GNUBOARD5</span>
+    <span id="bar_txt">INSTALLATION</span>
+  </div>
+
+  <%
+    // 파일이 존재한다면 설치할 수 없다.
+    let dbconfig_file = data_path + '/' + config.G5_DBCONFIG_FILE
+    if(fs.existsSync(dbconfig_file)) {
+  %>
+  <h1><%= config.G5_VERSION %> 프로그램이 이미 설치되어 있습니다.</h1>
+
+  <div class="ins_inner">
+    <p>프로그램이 이미 설치되어 있습니다.<br />새로 설치하시려면 다음 파일을 삭제 하신 후 새로고침 하십시오.</p>
+      <ul>
+        <li><%= dbconfig_file %></li>
+      </ul>
+    </div>
+    <% } else { 
+      exists_data_dir = true // GLOBAL
+      // data 디렉토리가 있는가?
+      if(!(fs.existsSync(data_path) && fs.lstatSync(data_path).isDirectory())) { %>
+    <h1><%= config.G5_VERSION %> 설치를 위해 아래 내용을 확인해 주십시오.</h1>
+
+    <div class="ins_inner">
+      <p>
+        루트 디렉토리에 아래로 <%= config.G5_DATA_DIR %> 디렉토리를 생성하여 주십시오.<br />
+        (common.js 파일이 있는곳이 루트 디렉토리 입니다.)<br /><br />
+        $> mkdir <%= config.G5_DATA_DIR %><br /><br />
+        윈도우의 경우 data 폴더를 하나 생성해 주시기 바랍니다.<br /><br />
+        위 명령 실행후 브라우저를 새로고침 하십시오.
+      </p>
+    </div>
+    <% exists_data_dir = false
+      } %>
+
+    <%
+      write_data_dir = true // GLOBAL
+      // data 디렉토리에 파일 생성 가능한지 검사.
+      if(os.platform !== 'win32') {
+        try  {
+          fs.accessSync(data_path, fs.constants.R_OK)
+        } catch(err) {
+        %>
+        <div class="ins_inner">
+          <p>
+            <%= config.G5_DATA_DIR %> 디렉토리의 퍼미션을 705로 변경하여 주십시오.<br /><br />
+            $> chmod 705 <%= config.G5_DATA_DIR %> 또는 chmod uo+rx <%= config.G5_DATA_DIR %><br /><br />
+            위 명령 실행후 브라우저를 새로고침 하십시오.
+          </p>
+        </div>
+          
+        <% 
+          write_data_dir = false
+        }
+      }
+    } %>
+  </div>
