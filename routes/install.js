@@ -37,4 +37,13 @@ router.post('/install_config/', (req, res) => {
   res.render('install/install_config', {POST: req.body, config, fs, os})
 })
 
+router.get('/install_config/', (req, res) => {
+  try {
+    res.send(ejs.render("<% let title = config.G5_VERSION + \" 초기환경설정 2/3\" %><%- include('" + path + "/page/install/install.inc.ejs', {title, fs, os}) %><div class=\"ins_inner\"><p>라이센스(License) 내용에 동의하셔야 설치를 계속하실 수 있습니다.</p><div class=\"inner_btn\"><a href=\"../\">뒤로가기</a></div></div>", {config, fs, os}))
+  } catch(err) {
+    console.error(err)
+    res.sendStatus(500)
+  }
+})
+
 module.exports = router
