@@ -8,6 +8,7 @@ const os = require('os')
 const slash = require('express-slash')
 
 const config = require('../config')
+const commonLib = require('../lib/common.lib')
 
 router.get('/', (req, res) => {
   res.set('Content-Type', 'text/html; charset=utf-8')
@@ -44,6 +45,10 @@ router.get('/install_config/', (req, res) => {
     console.error(err)
     res.sendStatus(500)
   }
+})
+
+router.post('/ajax.install.check/', (req, res) => {
+  // include_once('../lib/json.lib.php'); // js has built-in json library
 })
 
 module.exports = router

@@ -4,5 +4,8 @@
     "express": "^4.17.1",
     "express-slash": "^2.0.1",
     "path": "^0.12.7"
+  },
+  "optionalDependencies": {
+    "crypto": "^1.0.1"
   }
 }
