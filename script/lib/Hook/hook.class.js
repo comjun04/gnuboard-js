@@ -14,6 +14,8 @@
  * @since 1.0.0
  */
 class Hook {
+  static _class = Hook
+
   /**
    * Instance id.
    *
@@ -98,12 +100,12 @@ class Hook {
   */
 
   static getInstance(id = '0', calledClass) {
-    Hook.id = id
-    if (Hook.instances.get(Hook.id) !== undefined) {
-      return Hook.instances.get(Hook.id)
+    this.id = id
+    if (this.instances.get(this.id) !== undefined) {
+      return this.instances.get(this.id)
     }
 
-    return Hook.instances[Hook.id] = new calledClass()
+    return this.instances[this.id] = new calledClass()
   }
 
   /**
@@ -121,7 +123,7 @@ class Hook {
    * @public
    */
   static addAction(tag, func, prioirty = 8, args = 0) {
-    let that = Hook.getInstance(Hook.id, Hook)
+    let that = this.getInstance(this.id, this._class)
     
     if(!Array.isArray(that.callbacks.get(tag))) that.callbacks.set(tag, [])
     let _arr = that.callbacks.get(tag)
@@ -148,7 +150,7 @@ class Hook {
    */
   static addActions(actions) {
     actions.forEach((_arguments) => {
-      Hook.addAction.apply(null, _arguments)
+      this.addAction.apply(null, _arguments)
     })
   }
 
@@ -173,9 +175,9 @@ class Hook {
    */
 
   static doAction(tag, args = [], remove = true) {
-    let that = Hook.getInstance(Hook.id, Hook)
+    let that = this.getInstance(this.id, this._class)
 
-    Hook.current = tag
+    this.current = tag
 
     that.actions.set('count', that.actions.get('count')++)
 
@@ -195,7 +197,7 @@ class Hook {
       })
     })
 
-    Hook.current = false
+    this.current = false
     
     return action != null ? action : false
   }
@@ -210,7 +212,7 @@ class Hook {
    * @public
    */
   static setSingletonName(method) {
-    let that = Hook.getInstance(Hook.id, Hook)
+    let that = this.getInstance(this.id, this._class)
 
     that.singleton = method
   }
@@ -224,8 +226,8 @@ class Hook {
    *
    * @public
    */
-  static current() {
-    return Hook.current()
+  static currentFunc() {
+    return this.current
   }
 
   /**
@@ -240,7 +242,7 @@ class Hook {
    * @public
    */
   static isAction(tag) {
-    let that = Hook.getInstance(Hook.id, Hook)
+    let that = this.getInstance(this.id, this._class)
 
     return that.callbacks.get(tag) != null
   }
