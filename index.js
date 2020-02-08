@@ -1,9 +1,12 @@
 const express = require('express')
 const ejs = require('ejs')
 const slash = require('express-slash')
+const path = require('path')
 
 const indexRouter = require('./routes/index')
 const installRouter = require('./routes/install')
+
+global.appRoot = path.resolve(__dirname)
 
 const app = express()
 
