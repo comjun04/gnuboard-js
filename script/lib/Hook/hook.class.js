@@ -268,9 +268,11 @@ class Hook {
 
     args = this.getArguments(argsNumber, args)
 
+    let obj
+
     if(!(_class && method) && typeof _function === 'function') {
       _function.apply(null, args)
-    } else if(let obj = _class[this.singleton].call()) {
+    } else if(obj = _class[this.singleton].call()) {
       if(obj !== false) {
         return obj[method].apply(null, args)
       }
@@ -322,13 +324,13 @@ class Hook {
   {
     if (argsNumber == 1 && typeof _arguments === 'string') {
       return [_arguments]
-    } else if (argsNumber === _arguments.length)) {
+    } else if (argsNumber === _arguments.length) {
       return _arguments
     }
 
     for (let i = 0; i < argsNumber; i++) {
       if (_arguments[i] != null) {
-        args[] = _arguments[i]
+        args.push(_arguments[i])
         continue
       }
 
