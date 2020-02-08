@@ -34,9 +34,11 @@ class GML_Hook extends Hook {
 
     args = this.getArguments(argsNumber, args)
 
+    let obj
+
     if(!(_class && method) && typeof _function === 'function') {
       return _function.apply(null, args)
-    } else if(let obj = _class[this.singleton].call()) {
+    } else if(obj = _class[this.singleton].call()) {
       if(obj !== false) {
       return obj[method].apply(null, args)
     }

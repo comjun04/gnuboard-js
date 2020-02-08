@@ -10,10 +10,9 @@
     <a href="../">뒤로가기</a>
   </div>
 </div>
-<% } else { %>
-<%#
-  $tmp_str = isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : '';
-  $ajax_token = md5($tmp_str.$_SERVER['REMOTE_ADDR'].$_SERVER['DOCUMENT_ROOT']);
+<% } else { 
+  let tmp_str = /* isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : */ ''
+  let ajax_token = crypto.createHash('md5').update(tmp_str + IP + global.appRoot + '').digest('hex')
 %>
 
 <form id="frm_install" method="post" action="../install_db/" autocomplete="off" onsubmit="return frm_install_submit(this)">
@@ -62,7 +61,7 @@
 
     <table class="ins_frm">
       <caption>최고관리자 정보입력</caption>
-      <input type="hidden" name="ajax_token" value="<?php echo $ajax_token; ?>" >
+      <input type="hidden" name="ajax_token" value=<%= ajax_token %>>
       <colgroup>
         <col style="width:150px">
         <col>
@@ -181,14 +180,17 @@
       return false
     }
     if (window.jQuery) {
-      var jqxhr = jQuery.post( "../ajax.install.check", $(f).serialize(), function(data) {
+      var jqxhr = jQuery.post( "../ajax.install.check/", $(f).serialize(), function(data) {
         if( data.error ) {
           alert(data.error)
+          console.log(data.error)
         } else if( data.exists ) {
             if( confirm(data.exists) ) {
+              console.log('pass 2')
               f.submit()
             }
         } else if( data.success ) {
+            console.log('pass 1')
             f.submit()
         }
       }, "json")
