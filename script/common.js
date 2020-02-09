@@ -1,2 +1,2 @@
-exports.member = new Map()
-exports.g5 = new Map()
+global.member = new Map()
+global.g5 = new Map()
