@@ -1,8 +1,7 @@
-<% let title = config.G5_VERSION + " 초기환경설정 2/3" %>
-<%- include('./install.inc.ejs', {title, fs, os}) %>
+<%- include('./install.inc.ejs', {data: data.data_installInc}) %>
 
 <%
-  if(POST.agree !== '동의함') {
+  if(data._status === 'LicenseNotAgree') {
 %>
 <div class="ins_inner">
   <p>라이센스(License) 내용에 동의하셔야 설치를 계속하실 수 있습니다.</p>
@@ -10,10 +9,7 @@
     <a href="../">뒤로가기</a>
   </div>
 </div>
-<% } else { 
-  let tmp_str = /* isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : */ ''
-  let ajax_token = crypto.createHash('md5').update(tmp_str + IP + global.appRoot + '').digest('hex')
-%>
+<% } else { %>
 
 <form id="frm_install" method="post" action="../install_db/" autocomplete="off" onsubmit="return frm_install_submit(this)">
 
@@ -61,7 +57,7 @@
 
     <table class="ins_frm">
       <caption>최고관리자 정보입력</caption>
-      <input type="hidden" name="ajax_token" value=<%= ajax_token %>>
+      <input type="hidden" name="ajax_token" value=<%= data.ajax_token %>>
       <colgroup>
         <col style="width:150px">
         <col>

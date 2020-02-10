@@ -1,11 +1,8 @@
-<% data_path = './' + config.G5_DATA_DIR
-  if(!title) title = G5_VERSION + ' 설치' %>
-
 <!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title><%= title %></title>
+  <title><%= data.title %></title>
   <link rel="stylesheet" href="../../src/css/install/install.css">
 </head>
 <body>
@@ -16,8 +13,7 @@
 
   <%
     // 파일이 존재한다면 설치할 수 없다.
-    let dbconfig_file = data_path + '/' + config.G5_DBCONFIG_FILE
-    if(fs.existsSync(dbconfig_file)) {
+    if(data._status === 'DBConfigExists') {
   %>
   <h1><%= config.G5_VERSION %> 프로그램이 이미 설치되어 있습니다.</h1>
 
@@ -27,10 +23,8 @@
         <li><%= dbconfig_file %></li>
       </ul>
     </div>
-    <% } else { 
-      exists_data_dir = true // GLOBAL
-      // data 디렉토리가 있는가?
-      if(!(fs.existsSync(data_path) && fs.lstatSync(data_path).isDirectory())) { %>
+  <% } else {
+        if(!data.exists_data_dir) { %>
     <h1><%= config.G5_VERSION %> 설치를 위해 아래 내용을 확인해 주십시오.</h1>
 
     <div class="ins_inner">
@@ -42,17 +36,11 @@
         위 명령 실행후 브라우저를 새로고침 하십시오.
       </p>
     </div>
-    <% exists_data_dir = false
-      } %>
+  <% 
+        }
 
-    <%
-      write_data_dir = true // GLOBAL
-      // data 디렉토리에 파일 생성 가능한지 검사.
-      if(os.platform !== 'win32') {
-        try  {
-          fs.accessSync(data_path, fs.constants.R_OK)
-        } catch(err) {
-        %>
+        if(!data.write_data_dir) {
+  %>
         <div class="ins_inner">
           <p>
             <%= config.G5_DATA_DIR %> 디렉토리의 퍼미션을 705로 변경하여 주십시오.<br /><br />
@@ -61,9 +49,8 @@
           </p>
         </div>
           
-        <% 
-          write_data_dir = false
+  <% 
         }
       }
-    } %>
+  %>
   </div>

@@ -1,5 +1,4 @@
 const microseconds = require('microseconds')
-const knex = require('knex')
 
 const config = require('../../config')
 const common = require('../common')
@@ -154,6 +153,14 @@ function sql_select_db(db, connect) {
 }
 */
 
+async function sql_set_charset(charset, link = null) {
+  let g5 = global.g5
+
+  if(!link) link = g5.get('connect_db')
+
+  await link.raw('set names ' + charset)
+}
+
 /*
 // mysqli_query 와 mysqli_error 를 한꺼번에 처리
 // mysql connect resource 지정 - 명랑폐인님 제안
@@ -182,3 +189,5 @@ function sql_query(sql, error = config.G5_DISPLAY_SQL_ERROR, link = null) {
   } 
 }
 */
+
+exports.sql_set_charset = sql_set_charset

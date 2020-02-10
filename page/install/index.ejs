@@ -1,10 +1,9 @@
-<% let title = config.G5_VERSION + ' 라이센스 확인 1/3' %>
-<%- include('./install.inc.ejs', {title, fs, os}) %>
+<%- include('./install.inc.ejs', {data: data.data_installInc, title: data.title}) %>
 
 <%
-  if(exists_data_dir && write_data_dir) { 
+  if(data.data_installInc.exists_data_dir && data.data_installInc.write_data_dir) { 
 %>
-<%- include('./library.check.ejs', {config}) %>
+<%- include('./library.check.ejs', config) %>
 <form action="./install_config/" method="post" onsubmit="return frm_submit(this);">
 
   <div class="ins_inner">

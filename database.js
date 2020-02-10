@@ -11,27 +11,28 @@ function create(host, user, pass, db) {
       user: user || dbconfig.G5_MYSQL_USER,
       password: pass || dbconfig.G5_MYSQL_PASSWORD,
       database: db || dbconfig.G5_MYSQL_DB
-    }
+    },
+    asyncStackTraces: false // debug
   })
 }
 
 async function connectionTest(instance) {
   try {
     await instance.raw('select 1+1 as test')
-    console.log('db ok')
     return true
   } catch(err) {
-    console.log(err)
-    return false
+    throw err
   }
 }
 
+/*
 function reload() {
   delete require.cache[require.resolve('./dbconfig')]
   dbconfig = require('./dbconfig')
   return create()
 }
+*/
 
 exports.create = create
 exports.connectionTest = connectionTest
-exports.reload = reload
+//exports.reload = reload
