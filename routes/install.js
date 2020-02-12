@@ -53,9 +53,8 @@ router.post('/ajax.install.check/', async (req, res) => {
   }
 })
 
-router.use('/install_db/', async (req, res) => {
+router.post('/install_db/', async (req, res) => {
   let data = await installDB(req, res)
-  console.log(data)
   res.render('install/install_db', {data, config})
 })
 

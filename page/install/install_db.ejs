@@ -1,0 +1,30 @@
+<%- include('./install.inc.ejs', {data: data.data_installInc, config}) %>
+
+<%# //print_r($_POST); exit; %>
+
+<%
+  if (data._status === 'UnsafeAdminID') {
+%>
+<div class="ins_inner"><p>관리자 아이디는 영문자, 숫자, _ 만 입력하세요.</p><div class="inner_btn"><a href="../install_config/">뒤로가기</a></div></div>
+<%- include('./install.inc2.ejs') %>
+
+<%
+  } else if(data._status === 'MySQLError') {
+%>
+<div class="ins_inner">
+  <p>MySQL Host, User, Password, DB를 확인해 주십시오.</p>
+  <div class="inner_btn"><a href="../install_config/">뒤로가기</a></div>
+</div>
+<%- include('./install.inc2.ejs') %>
+
+<%
+  } else {
+%>
+<div class="ins_inner">
+  <h2><%= config.G5_VERSION %> 설치가 시작되었습니다.</h2>
+
+  <ol>
+<%
+  }
+
+%>
