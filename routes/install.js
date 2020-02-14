@@ -38,7 +38,7 @@ router.post('/ajax.install.check/', async (req, res) => {
   let data = await ajaxInstallCheck(req, res)
 
   if(data._status === 'AlreadyInstalled') {
-    res.end(installFunction.install_json_msg('프로그램이 >이미 설치되어 있습니다.'))
+    res.end(installFunction.install_json_msg('프로그램이 이미 설치되어 있습니다.'))
   } else if(data._status === 'InvalidRequest') {
     res.end(installFunction.install_json_msg('잘못된 요청입니다.'))
   } else if(data._status === 'MySQLError') {
