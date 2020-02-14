@@ -3,6 +3,7 @@ const DB = require('../../database')
 const config = require('../../config')
 
 const commonLib = require('../lib/common.lib')
+const urlLib = require('../lib/url.lib')
 const installFunction = require('./install.function')
 const installInc = require('./install.inc')
 
