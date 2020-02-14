@@ -10,12 +10,12 @@ function generate_seo_title(string, wordLimit = config.G5_SEO_TITEL_WORD_CUT) {
     string = wordArr.slice(0, wordLimit).join(' ')
   }
 
-  let quoteSeparator = RegExp.escape(separator, '#')
+  let quoteSeparator = /*RegExp.escape(*/separator/*, '#')*/
 
   let trans = new Map([
     ['&.+?;', ''],
-    ['[^\w\d _-]', ''],
-    ['\s+', separator],
+    ['[^\\w\\d _-ㄱ-ㅎㅏ-ㅣ가-힣]', ''],
+    ['\\s+', separator],
     ['(' + quoteSeparator + ')+', separator]
   ])
 
@@ -28,7 +28,7 @@ function generate_seo_title(string, wordLimit = config.G5_SEO_TITEL_WORD_CUT) {
   */
 
   trans.forEach((val, key) => {
-    string = string.replace(new RegExp('#' + key + '#iu', 'iu'), val)
+    string = string.replace(new RegExp(key, 'iu'), val)
   })
 
   string = string.toLowerCase()

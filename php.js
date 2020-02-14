@@ -11,9 +11,8 @@ function gmdate() {
 function strip_tags(str, whitelist = '') { // whitelist usage: p, img, pre, ..etc
   const $ = cheerio.load(str)
   let contents = ''
-  console.log($("*").not('p'))
-  $("*").not(whitelist).each(function() {
-    contents += $(this).contents()
+  $("body").not(whitelist).each(function() {
+    contents += $(this).text()
   })
   return contents
 }
@@ -25,5 +24,6 @@ function trim(str, character_mask) {
 
 module.exports = {
   gmdate,
-  strip_tags
+  strip_tags,
+  trim
 }
