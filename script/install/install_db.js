@@ -3,6 +3,7 @@ const DB = require('../../database')
 const config = require('../../config')
 
 const commonLib = require('../lib/common.lib')
+const urlLib = require('../lib/url.lib')
 const installFunction = require('./install.function')
 const installInc = require('./install.inc')
 
@@ -1006,7 +1007,7 @@ async function run(req, res, data = {}) {
         co_id: 'company',
         co_html: 1,
         co_subject: '회사소개',
-        co_seo_title: generate_seo_title('회사소개'),
+        co_seo_title: urlLib.generate_seo_title('회사소개'),
         co_content: '<p align=center><b>회사소개에 대한 내용을 입력하십시오.</b></p>'
       })
 

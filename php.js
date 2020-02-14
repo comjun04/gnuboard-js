@@ -1,3 +1,5 @@
+const cheerio = require('cheerio')
+
 function gmdate() {
   let datenow = new Date()                                   
   let day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -6,4 +8,22 @@ function gmdate() {
   return gmnow
 }
 
-exports.gmdate = gmdate
+function strip_tags(str, whitelist = '') { // whitelist usage: p, img, pre, ..etc
+  const $ = cheerio.load(str)
+  let contents = ''
+  console.log($("*").not('p'))
+  $("*").not(whitelist).each(function() {
+    contents += $(this).contents()
+  })
+  return contents
+}
+
+function trim(str, character_mask) {
+  let c = RegExp.escape(character_mask)
+  return str.replace(new RegExp(`/^${c}+|${c}+$/`, 'g'), '')
+}
+
+module.exports = {
+  gmdate,
+  strip_tags
+}

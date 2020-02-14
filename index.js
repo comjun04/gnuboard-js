@@ -37,6 +37,6 @@ app.listen(4000, () => {console.log('server started')})
 
 // RegExp escape function
 // https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
-RegExp.escape = function(s) {
-  return s.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&') // not matching '/'
+RegExp.escape = function(s, c) {
+  return s.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&').replace (new RegExp(`/${c}/`, 'g'), '\\$&') // not matching '/'
 }
