@@ -52,7 +52,9 @@ async function run(req, res, data = {}) {
 
   // 테이블 생성 ------------------------------------
   // 기존 sql파일에서 불러와서 하는 방식에서 스크립트에서 쿼리 실행하는 방식으로 변경
-  dblink.transaction(async (trx) => {
+  try {
+  await dblink.transaction(async (trx) => {
+    try {
     await dblink.schema.dropTableIfExists(table_prefix + 'auth')
     await dblink.schema.createTable(table_prefix + 'auth', (table) => {
       table.string('mb_id', 20).notNullable().defaultTo('')
@@ -269,7 +271,7 @@ async function run(req, res, data = {}) {
       table.specificType('cf_use_recommend', 'tinyint(4)').notNullable().defaultTo(0)
       table.integer('cf_recommend_point').notNullable().defaultTo(0)
       table.integer('cf_leave_day').notNullable().defaultTo(0)
-      table.integer('cg_search_part').notNullable().defaultTo(0)
+      table.integer('cf_search_part').notNullable().defaultTo(0)
       table.specificType('cf_email_use', 'tinyint(4)').notNullable().defaultTo(0)
       table.specificType('cf_email_wr_super_admin', 'tinyint(4)').notNullable().defaultTo(0)
       table.specificType('cf_email_wr_group_admin', 'tinyint(4)').notNullable().defaultTo(0)
@@ -840,7 +842,7 @@ async function run(req, res, data = {}) {
       table.integer('nw_width').notNullable().defaultTo(0)
       table.text('nw_subject').notNullable()
       table.text('nw_content').notNullable()
-      table.specificType('nw_content_html').notNullable().defaultTo(0)
+      table.specificType('nw_content_html', 'tinyint(4)').notNullable().defaultTo(0)
 
       table.engine('MyISAM')
       table.charset('utf8')
@@ -855,15 +857,171 @@ async function run(req, res, data = {}) {
       table.string('me_target', 255).notNullable().defaultTo('')
       table.integer('me_order').notNullable().defaultTo(0)
       table.specificType('me_use', 'tinyint(4)').notNullable().defaultTo(0)
-      table.specificType('me_mobile_use', 'tinyint(4)').nnotNullable().defaultTo(0)
+      table.specificType('me_mobile_use', 'tinyint(4)').notNullable().defaultTo(0)
 
       table.engine('MyISAM')
       table.charset('utf8')
     })
+    } catch(err) {
+      await trx.rollback()
+      returnData.installStep = 0
+      throw err
+    }
 
     await trx.commit()
-    // TODO catch() => show error message
   })
+
+  // 테이블 생성 ------------------------------------
+
+  let read_point = 0
+  let write_point = 0
+  let comment_point = 0
+  let download_point = 0
+
+  //-------------------------------------------------------------------------------------------------
+  // config 테이블 설정
+  await dblink.transaction(async (trx) => {
+    try {
+      await dblink.from(table_prefix + 'config').insert({
+        cf_title: config.G5_VERSION,
+        cf_theme: 'basic',
+        cf_admin: admin_id,
+        cf_admin_email: admin_email,
+        cf_admin_email_name: config.G5_VERSION,
+        cf_use_point: 1,
+        cf_use_copy_log: 1,
+        cf_login_point: 100,
+        cf_memo_send_point: 500,
+        cf_cut_name: 15,
+        cf_nick_modify: 60,
+        cf_new_skin: 'basic',
+        cf_new_rows: '15',
+        cf_search_skin: 'basic',
+        cf_connect_skin: 'basic',
+        cf_read_point: read_point,
+        cf_write_point: write_point,
+        cf_comment_point: comment_point,
+        cf_download_point: download_point,
+        cf_write_pages: 10,
+        cf_mobile_pages: 5,
+        cf_link_target: '_blank',
+        cf_delay_sec: '30',
+        cf_filter: '18아,18놈,18새끼,18뇬,18노,18것,18넘,개년,개놈,개뇬,개새,개색끼,개세끼,개세이,개쉐이,개쉑,개쉽,개시키,개자식,개좆,게색기,게색끼,광뇬,뇬,눈깔,뉘미럴,니귀미,니기미,니미,도촬,되질래,뒈져라,뒈진다,디져라,디진다,디질래,병쉰,병신,뻐큐,뻑큐,뽁큐,삐리넷,새꺄,쉬발,쉬밸,쉬팔,쉽알,스패킹,스팽,시벌,시부랄,시부럴,시부리,시불,시브랄,시팍,시팔,시펄,실밸,십8,십쌔,십창,싶알,쌉년,썅놈,쌔끼,쌩쑈,썅,써벌,썩을년,쎄꺄,쎄엑,쓰바,쓰발,쓰벌,쓰팔,씨8,씨댕,씨바,씨발,씨뱅,씨봉알,씨부랄,씨부럴,씨부렁,씨부리,씨불,씨브랄,씨빠,씨빨,씨뽀랄,씨팍,씨팔,씨펄,씹,아가리,아갈이,엄창,접년,잡놈,재랄,저주글,조까,조빠,조쟁이,조지냐,조진다,조질래,존나,존니,좀물,좁년,좃,좆,좇,쥐랄,쥐롤,쥬디,지랄,지럴,지롤,지미랄,쫍빱,凸,퍽큐,뻑큐,빠큐,ㅅㅂㄹㅁ',
+        cf_possible_ip: '',
+        cf_intercept_ip: '',
+        cf_analytics: '',
+        cf_member_skin: 'basic',
+        cf_mobile_new_skin: 'basic',
+        cf_mobile_search_skin: 'basic',
+        cf_mobile_connect_skin: 'basic',
+        cf_mobile_member_skin: 'basic',
+        cf_faq_skin: 'basic',
+        cf_mobile_faq_skin: 'basic',
+        cf_editor: 'smarteditor2',
+        cf_captcha_mp3: 'basic',
+        cf_register_level: 2,
+        cf_register_point: 1000,
+        cf_icon_level: 2,
+        cf_leave_day: 30,
+        cf_search_part: '10000',
+        cf_email_use: '1',
+        cf_prohibit_id: 'admin,administrator,관리자,운영자,어드민,주인장,webmaster,웹마스터,sysop,시삽,시샵,manager,매니저,메니저,root,루트,su,guest,방문객',
+        cf_prohibit_email: '',
+        cf_new_del: 30,
+        cf_memo_del: 180,
+        cf_visit_del: 180,
+        cf_popular_del: 180,
+        cf_use_member_icon: 2,
+        cf_member_icon_size: 5000,
+        cf_member_icon_width: 22,
+        cf_member_icon_height: 22,
+        cf_member_img_size: 50000,
+        cf_member_img_width: 60,
+        cf_member_img_height: 60,
+        cf_login_minutes: 10,
+        cf_image_extension: 'gif|jpg|jpeg|png',
+        cf_flash_extension: 'swf',
+        cf_movie_extension: 'asx|asf|wmv|wma|mpg|mpeg|mov|avi|mp3',
+        cf_formmail_is_member: 1,
+        cf_page_rows: 15,
+        cf_mobile_page_rows: 15,
+        cf_cert_limit: 2,
+        cf_stipulation: '해당 홈페이지에 맞는 회원가입약관을 입력합니다.',
+        cf_privacy: '해당 홈페이지에 맞는 개인정보처리방침을 입력합니다.',
+
+        cf_add_script: '',
+        cf_add_meta: '',
+        cf_facebook_appid: '',
+        cf_facebook_secret: '',
+        cf_twitter_key: '',
+        cf_twitter_secret: ''
+      })
+
+      // 1:1문의 설정
+      await dblink.from(table_prefix + 'qa_config').insert({
+        qa_title: '1:1문의',
+        qa_category: '회원|포인트',
+        qa_skin: 'basic',
+        qa_mobile_skin: 'basic',
+        qa_use_email: 1,
+        qa_req_email: 0,
+        qa_use_hp: 1,
+        qa_req_hp: 0,
+        qa_use_editor: 1,
+        qa_subject_len: 60,
+        qa_mobile_subject_len: 30,
+        qa_page_rows: 15,
+        qa_mobile_page_rows: 15,
+        qa_image_width: 600,
+        qa_upload_size: 1048576,
+        qa_insert_content: '',
+
+        qa_content_head: '',
+        qa_content_tail: '',
+        qa_mobile_content_head: '',
+        qa_mobile_content_tail: ''
+      })
+
+      // 관리자 회원가입
+      await dblink.from(table_prefix + 'member').insert({
+        mb_id: admin_id,
+        mb_password: await commonLib.get_encrypt_string(admin_pass, dblink),
+        mb_name: admin_name,
+        mb_nick: admin_name,
+        mb_email: admin_email,
+        mb_level: 10,
+        mb_mailling: 1,
+        mb_open: 1,
+        mb_email_certify: config.G5_TIME_YMDHIS,
+        mb_datetime: config.G5_TIME_YMDHIS,
+        mb_ip: req.ip,
+
+        mb_signature: '',
+        mb_memo: '',
+        mb_profile: ''
+      })
+
+      // 내용관리 생성
+      dblink.from(table_prefix + 'content').insert({
+        co_id: 'company',
+        co_html: 1,
+        co_subject: '회사소개',
+        co_seo_title: generate_seo_title('회사소개'),
+        co_content: '<p align=center><b>회사소개에 대한 내용을 입력하십시오.</b></p>'
+      })
+
+      await trx.commit()
+    } catch(err) {
+      await trx.rollback(err)
+      returnData.installStep = 1
+      throw err
+    }
+  })
+  } catch(err) {
+    returnData._status = 'InstallError'
+    returnData.err = err
+    return returnData
+  }
 
   returnData._status = 'OK'
   return returnData

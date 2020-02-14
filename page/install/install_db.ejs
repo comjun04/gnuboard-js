@@ -25,6 +25,30 @@
 
   <ol>
 <%
+    if(data._status === 'InstallError' && data.installStep == 0) {
+%>
+    <li>
+      <strong>전체 테이블 생성 중 오류가 발생하였습니다.</strong>
+      <p><%= data.err.stack %></p>
+    </li>
+<%
+    } else {
+%>
+    <li>전체 테이블 생성 완료</li>
+<%
+      if(data._status === 'InstallError' && data.installStep == 1) {
+%>
+    <li>
+      <strong>DB설정 중 오류가 발생하였습니다.</strong>
+      <p><%= data.err.stack %></p>
+    </li>
+<%
+      } else {
+%>
+    <li>DB설정 완료</li>
+<%
+      }
+    }
   }
 
 %>

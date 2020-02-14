@@ -56,9 +56,8 @@ exports.create_hash = (password, force_compat = false) => {
   if (function_exists('mcrypt_create_iv')) {
     $salt = base64_encode(mcrypt_create_iv(PBKDF2_COMPAT_SALT_BYTES, MCRYPT_DEV_URANDOM));
   } else */
-  if (fs.existsSync('/dev/urandom')) {
-    let fp = fs.readFileSync('/dev/urandom')
-    salt = fp.toString('utf8', 0, PBKDF2_salt_bytes).btoa()
+  if (crypto.randomBytes) {
+    salt = crypto.randomBytes(PBKDF2_salt_bytes).toString('base64')
   } else {
       for (let i = 0; i < PBKDF2_salt_bytes; i += 2) {
         salt.concat(Buffer.from(Math.floor(Math.random() * 65535) + '').toString('utf16le'))
@@ -70,7 +69,7 @@ exports.create_hash = (password, force_compat = false) => {
 
   let algo = PBKDF2_hash_algorithm.toLowerCase(),
     iterations = PBKDF2_iterations
-  if(force_compat || !crypto.getHashes().has(algo)) {
+  if(force_compat || !crypto.getHashes().includes(algo)) {
     algo = false // This flag will be detected by pbkdf2_default()
     iterations = Math.round(iterations / 5) // PHP 4 is very slow. Don't cause too much server load. // THIS IS NOT PHP
   }
@@ -79,7 +78,7 @@ exports.create_hash = (password, force_compat = false) => {
 
   let pbkdf2 = pbkdf2_default(algo, password, salt, iterations, PBKDF2_hash_bytes)
   let prefix = algo ? algo : 'sha1'
-  return `${prefix}:${iterations}:${salt}:${pbkdf2.btoa()}`
+  return `${prefix}:${iterations}:${salt}:${Buffer.from(pbkdf2).toString('base64')}`
 }
 
 // Checks whether a password matches a previously calculated hash
@@ -91,7 +90,7 @@ function validate_password(password, hash) {
 
   // Recalculate the hash and compare it with the original.
   
-  let pbkdf2 = params[3].atob()
+  let pbkdf2 = Bugger.from(params[3]).toString('utf8')
   let pbkdf2_check = pbkdf2_default(params[0], password, params[2], parseInt(params[1]), pbkdf2.length)
   return slow_equals(pbkdf2, pbkdf2_check)
 }
@@ -144,7 +143,7 @@ function pbkdf2_default(algo, password, salt, count, key_length)
   // Check if the selected algorithm is available.
                                                  
   algo = algo.toLowerCase()
-  if (!crypto.getHashes().has(algo)) {
+  if (!crypto.getHashes().includes(algo)) {
     if (algo === 'sha1') {
       return pbkdf2_fallback(password, salt, count, key_length)
     } else {

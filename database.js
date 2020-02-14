@@ -12,7 +12,8 @@ function create(host, user, pass, db) {
       password: pass || dbconfig.G5_MYSQL_PASSWORD,
       database: db || dbconfig.G5_MYSQL_DB
     },
-    asyncStackTraces: false // debug
+    debug: false,
+    asyncStackTraces: true // debug
   })
 }
 

@@ -1,3 +1,5 @@
+const pbkdf2 = require('./script/lib/pbkdf2.compat')
+
 let config = {}
 
 /********************
@@ -144,7 +146,7 @@ config.G5_USE_CACHE = true // 최신글등에 cache 기능 사용 여부
 const datenow = new Date()
 
 config.G5_SERVER_TIME = Math.floor(Date.now() / 1000) // TODO
-config.G5_TIME_YMDHIS = datenow.getFullYear() + '-' + (datenow.getMonth + 1) + '-' + datenow.getDate() + ' ' + datenow.getHours() + ':' + datenow.getMinutes() + ':' + datenow.getSeconds() // TODO
+config.G5_TIME_YMDHIS = datenow.getFullYear() + '-' + (datenow.getMonth() + 1) + '-' + datenow.getDate() + ' ' + datenow.getHours() + ':' + datenow.getMinutes() + ':' + datenow.getSeconds() // TODO
 config.G5_TIME_YMD = config.G5_TIME_YMDHIS.substring(0, 10)
 config.G5_TIME_HIS = config.G5_TIME_YMDHIS.substring(11, 19);
 
@@ -182,7 +184,7 @@ config.G5_SMTP_PORT = 25
 // 사이트 운영 중 설정을 변경하면 로그인이 안되는 등의 문제가 발생합니다.
 // 5.4 버전 이전에는 sql_password 이 사용됨, 5.4 버전부터 기본이 create_hash 로 변경
 // define('G5_STRING_ENCRYPT_FUNCTION', 'sql_password');
-config.G5_STRING_ENCRYPT_FUNCTION = 'create_hash'
+config.G5_STRING_ENCRYPT_FUNCTION = pbkdf2.create_hash
 config.G5_MYSQL_PASSWORD_LENGTH = 41 // mysql password length 41, old_password 의 경우에는 16
 
 // SQL 에러를 표시할 것인지 지정

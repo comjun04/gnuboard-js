@@ -190,4 +190,29 @@ function sql_query(sql, error = config.G5_DISPLAY_SQL_ERROR, link = null) {
 }
 */
 
-exports.sql_set_charset = sql_set_charset
+async function sql_password(value, db) {
+  // mysql 4.0x 이하 버전에서는 password() 함수의 결과가 16bytes
+  // mysql 4.1x 이상 버전에서는 password() 함수의 결과가 41bytes
+  let row = await db.select(db.raw(`password(${value})`).as('pass'))
+
+    return row.pass
+}
+
+// 문자열 암호화
+async function get_encrypt_string(str, db) {
+  let encrypt = ''
+  
+  if(config.G5_STRING_ENCRYPT_FUNCTION) {
+    encrypt = config.G5_STRING_ENCRYPT_FUNCTION.call(null, str)
+  } else {
+    encrypt = await sql_password(str, db)
+  }
+
+  return encrypt
+}
+
+module.exports = {
+  sql_set_charset,
+  get_encrypt_string
+}
+
