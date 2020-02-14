@@ -21,13 +21,13 @@ function run(data = {}) {
   
   let write_data_dir = true // GLOBAL
   // data 디렉토리에 파일 생성 가능한지 검사.
-  if(os.platform !== 'win32') {
+  if(os.platform != 'win32') {
     try {
       fs.accessSync(data_path, fs.constants.R_OK)
     } catch(err) {
       write_data_dir = false
     }
-  }
+  } else write_data_dir = true
 
   return {title: data.title, exists_data_dir, write_data_dir}
 }
