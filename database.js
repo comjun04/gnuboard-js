@@ -1,7 +1,10 @@
 const knex = require('knex')
 const fs = require('fs')
 
-let dbconfig = fs.existsSync('./dbconfig.js') ? require('./dbconfig') : {} // this file can reload
+const config = require('./config')
+
+let file = `${config.G5_DATA_DIR}/${config.G5_DBCONFIG_FILE}`
+let dbconfig = fs.existsSync(__dirname + '/' + file) ? require('./' + file) : {} // this file can reload
 
 function create(host, user, pass, db) {
   return knex({

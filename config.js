@@ -38,7 +38,7 @@ config.G5_DB_CHARSET = "utf8"
  */
 config.G5_COOKIE_DOMAIN = ""
 
-config.G5_DBCONFIG_FILE =   'dbconfig.php' // TODO change to js
+config.G5_DBCONFIG_FILE =   'dbconfig.js'
 
 config.G5_ADMIN_DIR =       'adm'
 config.G5_BBS_DIR =         'bbs'

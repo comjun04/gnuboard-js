@@ -10,7 +10,7 @@ function run(data = {}) {
   // 파일이 존재한다면 설치할 수 없다.
   let dbconfig_file = data_path + '/' + config.G5_DBCONFIG_FILE
   if(fs.existsSync(dbconfig_file)) {
-    return {_status: 'DBConfigExists'}
+    return {_status: 'DBConfigExists', dbconfig_file}
   }
 
   let exists_data_dir = true // GLOBAL
@@ -29,7 +29,7 @@ function run(data = {}) {
     }
   } else write_data_dir = true
 
-  return {title: data.title, exists_data_dir, write_data_dir}
+  return {title: data.title, exists_data_dir, write_data_dir, data_path}
 }
 
 module.exports = run

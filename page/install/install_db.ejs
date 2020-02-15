@@ -3,7 +3,11 @@
 <%# //print_r($_POST); exit; %>
 
 <%
-  if (data._status === 'UnsafeAdminID') {
+  if(data._status === 'DBConfigExists') {
+%>
+<%- include('./install.inc2.ejs') %>
+<%
+  } else if (data._status === 'UnsafeAdminID') {
 %>
 <div class="ins_inner"><p>관리자 아이디는 영문자, 숫자, _ 만 입력하세요.</p><div class="inner_btn"><a href="../install_config/">뒤로가기</a></div></div>
 <%- include('./install.inc2.ejs') %>
@@ -47,6 +51,54 @@
 %>
     <li>DB설정 완료</li>
 <%
+        if(data._status === 'InstallError' && data.installStep == 2) {
+%>
+    <li>
+      <strong>데이터 디렉토리 생성 중 오류가 발생하였습니다.</strong>
+      <p><%= data.err.stack %></p>
+    </li>
+<%
+        } else {
+%>
+    <li>데이터 디렉토리 생성 완료</li>
+<%
+          if(data._status === 'InstallError' && data.installStep == 3) {
+%>
+    <li>
+      <strong>DB설정 파일 생성 중 오류가 발생하였습니다. (<%= data.dbconfigFile %>)</strong>
+      <p><%= data.err.stack %></p>
+    </li>
+<%
+          } else {
+%>
+    <li>DB설정 파일 생성 완료 (<%= data.dbconfigFile %>)</li>
+  </ol>
+
+  <p>축하합니다. <%= config.G5_VERSION %> 설치가 완료되었습니다.</p>
+
+</div>
+
+<div class="ins_inner">
+
+  <h2>환경설정 변경은 다음의 과정을 따르십시오.</h2>
+
+  <ol>
+    <li>메인화면으로 이동</li>
+    <li>관리자 로그인</li>
+    <li>관리자 모드 접속</li>
+    <li>환경설정 메뉴의 기본환경설정 페이지로 이동</li>
+  </ol>
+
+  <div class="inner_btn">
+    <a href="../../">새로운 그누보드5로 이동</a>
+  </div>
+
+</div>
+
+<%- include('./install.inc2.ejs') %>
+<%
+          } 
+        }
       }
     }
   }

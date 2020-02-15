@@ -18,6 +18,9 @@ function run(req, res) {
   let title = config.G5_VERSION + " 초기환경설정 2/3"
 
   let data_installInc = installInc({title})
+  if(data_installInc._status === 'DBConfigExists') {
+    return {_status: 'DBConfigExists', data_installInc}
+  }
 
   if(req.body.agree !== '동의함') {
     return {_status: 'LicenseNotAgree', data_installInc}

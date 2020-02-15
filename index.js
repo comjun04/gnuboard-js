@@ -4,6 +4,9 @@ const slash = require('express-slash')
 const path = require('path')
 const knex = require('knex')
 
+// Global variable init
+require('./globals.js')()
+
 const DB = require('./database')
 
 const indexRouter = require('./routes/index')

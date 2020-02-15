@@ -1,7 +1,11 @@
 <%- include('./install.inc.ejs', {data: data.data_installInc}) %>
 
+
 <%
-  if(data._status === 'LicenseNotAgree') {
+  if(data._status === 'DBConfigExists') {
+%>
+<%
+  } else if(data._status === 'LicenseNotAgree') {
 %>
 <div class="ins_inner">
   <p>라이센스(License) 내용에 동의하셔야 설치를 계속하실 수 있습니다.</p>

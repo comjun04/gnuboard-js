@@ -1,3 +1,6 @@
+const path = require('path').resolve()
+const fs = require('fs')
+
 const PHP = require('../../php')
 const DB = require('../../database')
 const config = require('../../config')
@@ -6,6 +9,7 @@ const commonLib = require('../lib/common.lib')
 const urlLib = require('../lib/url.lib')
 const installFunction = require('./install.function')
 const installInc = require('./install.inc')
+const sqlWrite = require('../adm/sql_write')
 
 async function run(req, res, data = {}) {
   let returnData = {}
@@ -21,6 +25,11 @@ async function run(req, res, data = {}) {
 
   let title = config.G5_VERSION + ' 설치 완료 3/3'
   returnData.data_installInc = installInc({ title })
+
+  if(returnData.data_installInc._status === 'DBConfigExists') {
+    returnData._status = 'DBConfigExists'
+    return returnData
+  }
 
   let mysql_host = installFunction.safe_install_string_check(req.body.mysql_host)
   let mysql_user = installFunction.safe_install_string_check(req.body.mysql_user)
@@ -764,7 +773,7 @@ async function run(req, res, data = {}) {
 
         await dblink.schema.dropTableIfExists(table_prefix + 'content')
         await dblink.schema.createTable(table_prefix + 'content', (table) => {
-          table.string('co_id', 20).notNullable().defaultTo('')
+          table.string('co_id', 20).notNullable().defaultTo('').primary()
           table.specificType('co_html', 'tinyint(4)').notNullable().defaultTo(0)
           table.string('co_subject', 255).notNullable().defaultTo('')
           table.text('co_content', 'longtext').notNullable()
@@ -1005,13 +1014,132 @@ async function run(req, res, data = {}) {
         })
 
         // 내용관리 생성
-        dblink.from(table_prefix + 'content').insert({
+        await dblink.from(table_prefix + 'content').insert({
           co_id: 'company',
           co_html: 1,
           co_subject: '회사소개',
-          co_seo_title: generate_seo_title('회사소개'),
-          co_content: '<p align=center><b>회사소개에 대한 내용을 입력하십시오.</b></p>'
+          co_seo_title: urlLib.generate_seo_title('회사소개'),
+          co_content: '<p align=center><b>회사소개에 대한 내용을 입력하십시오.</b></p>',
+
+          co_mobile_content: ''
         })
+
+        await dblink.from(table_prefix + 'content').insert({
+          co_id: 'privacy',
+          co_html: 1,
+          co_subject: '개인정보 처리방침',
+          co_seo_title: urlLib.generate_seo_title('개인정보 처리방침'),
+          co_content: '<p align=center><b>개인정보 처리방침에 대한 내용을 입력하십시오.</b></p>',
+
+          co_mobile_content: ''
+        })
+
+        await dblink.from(table_prefix + 'content').insert({
+          co_id: 'provision',
+          co_html: 1,
+          co_subject: '서비스 이용약관',
+          co_seo_title: urlLib.generate_seo_title('서비스 이용약관'),
+          co_content: '<p align=center><b>서비스 이용약관에 대한 내용을 입력하십시오.</b></p>',
+
+          co_mobile_content: ''
+        })
+
+        // FAQ Master
+        await dblink.from(table_prefix + 'faq_master').insert({
+          fm_id: 1,
+          fm_subject: '자주하시는 질문',
+
+          fm_head_html: '',
+          fm_tail_html: '',
+          fm_mobile_head_html: '',
+          fm_mobile_tail_html: ''
+        })
+
+        // This project doesn't support 'Youngcart', so always false
+        let tmp_gr_id = config.G5_YOUNGCART_VER != null ? 'shop' : 'community'
+        let tmp_gr_subject = config.G5_YOUNGCART_VER != null ? '쇼핑몰' : '커뮤니티'
+
+        // 게시판 그룹 생성
+        await dblink.from(table_prefix + 'group').insert({
+          gr_id: tmp_gr_id,
+          gr_subject: tmp_gr_subject
+        })
+
+        // 게시판 그룹 생성
+        let tmp_bo_table = ["notice", "qa", "free", "gallery"]
+        let tmp_bo_subject = ["공지사항", "질문답변", "자유게시판", "갤러리"]
+        for(let i = 0; i < tmp_bo_table.length; i++) {
+          let bo_skin = tmp_bo_table[i] === 'gallery' ? 'gallery' : 'basic'
+
+          await dblink.from(table_prefix + 'board').insert({
+            bo_table: tmp_bo_table[i],
+            gr_id: tmp_gr_id,
+            bo_subject: tmp_bo_subject[i],
+            bo_device           : 'both',
+            bo_admin            : '',
+            bo_list_level       : 1,
+            bo_read_level       : 1,
+            bo_write_level      : 1,
+            bo_reply_level      : 1,
+            bo_comment_level    : 1,
+            bo_html_level       : 1,
+            bo_link_level       : 1,
+            bo_count_modify     : 1,
+            bo_count_delete     : 1,
+            bo_upload_level     : 1,
+            bo_download_level   : 1,
+            bo_read_point       : -1,
+            bo_write_point      : 5,
+            bo_comment_point    : 1,
+            bo_download_point   : -20,
+            bo_use_category     : 0,
+            bo_category_list    : '',
+            bo_use_sideview     : 0,
+            bo_use_file_content : 0,
+            bo_use_secret       : 0,
+            bo_use_dhtml_editor : 0,
+            bo_use_rss_view     : 0,
+            bo_use_good         : 0,
+            bo_use_nogood       : 0,
+            bo_use_name         : 0,
+            bo_use_signature    : 0,
+            bo_use_ip_view      : 0,
+            bo_use_list_view    : 0,
+            bo_use_list_content : 0,
+            bo_use_email        : 0,
+            bo_table_width      : 100,
+            bo_subject_len      : 60,
+            bo_mobile_subject_len      : 30,
+            bo_page_rows        : 15,
+            bo_mobile_page_rows : 15,
+            bo_new              : 24,
+            bo_hot              : 100,
+            bo_image_width      : 835,
+            bo_skin             : bo_skin,
+            bo_mobile_skin      : bo_skin,
+            bo_include_head     : '_head.php',
+            bo_include_tail     : '_tail.php',
+            bo_content_head     : '',
+            bo_content_tail     : '',
+            bo_mobile_content_head     : '',
+            bo_mobile_content_tail     : '',
+            bo_insert_content   : '',
+            bo_gallery_cols     : 4,
+            bo_gallery_width    : 202,
+            bo_gallery_height   : 150,
+            bo_mobile_gallery_width : 125,
+            bo_mobile_gallery_height: 100,
+            bo_upload_count     : 2,
+            bo_upload_size      : 1048576,
+            bo_reply_order      : 1,
+            bo_use_search       : 0,
+            bo_order            : 0,
+
+            bo_notice: ''
+          })
+
+          await sqlWrite(dblink, table_prefix, tmp_bo_table[i])
+        }
 
         await trx.commit()
       } catch (err) {
@@ -1020,6 +1148,71 @@ async function run(req, res, data = {}) {
         throw err
       }
     })
+
+    try {
+      let dir_arr = ['cache', 'editor', 'file', 'log', 'member', 'member_image', 'session', 'content', 'faq', 'tmp']
+
+      dir_arr.forEach((dir) => {
+        let _path = `${path}/${returnData.data_installInc.data_path}/${dir}`
+        if(!fs.existsSync(_path)) fs.mkdirSync(_path)
+        fs.chmodSync(_path, config.G5_DIR_PERMISSION + '')
+      })
+    } catch(err) {
+      returnData.installStep = 2
+      throw err
+    }
+    
+    let file = ''
+    try {
+      file = `${path}/${config.G5_DATA_DIR}/${config.G5_DBCONFIG_FILE}`
+      fs.writeFileSync(file, 
+        `let G5_MYSQL_HOST = '${mysql_host}'\n`
+          + `let G5_MYSQL_USER = '${mysql_user}'\n`
+          + `let G5_MYSQL_PASSWORD = '${mysql_pass}'\n`
+          + `let G5_MYSQL_DB = '${mysql_db}'\n`
+          // + `let G5_MYSQL_SET_MODE = ${mysql_set_mode}\n\n`
+          + `\nlet G5_TABLE_PREFIX = '${table_prefix}'\n\n`
+	  + `global.g5.set('write_prefix', G5_TABLE_PREFIX + 'write_') // 게시판 테이블명 접두사\n\n`
+	  + `global.g5.set('auth_table', G5_TABLE_PREFIX + 'auth') // 관리권한 설정 테이블\n`
+	  + `global.g5.set('config_table', G5_TABLE_PREFIX + 'config') // 기본환경 설정 테이블\n`
+	  + `global.g5.set('group_table', G5_TABLE_PREFIX + 'group') // 게시판 그룹 테이블\n`
+	  + `global.g5.set('group_member_table', G5_TABLE_PREFIX + 'group_member') // 게시판 그룹+회원 테이블\n`
+	  + `global.g5.set('board_table', G5_TABLE_PREFIX + 'board') // 게시판 설정 테이블\n`
+	  + `global.g5.set('board_file_table', G5_TABLE_PREFIX + 'board_file') // 게시판 첨부파일 테이블\n`
+	  + `global.g5.set('board_good_table', G5_TABLE_PREFIX + 'board_good') // 게시물 추천,비추천 테이블\n`
+	  + `global.g5.set('board_new_table', G5_TABLE_PREFIX + 'board_new') // 게시판 새글 테이블\n`
+	  + `global.g5.set('login_table', G5_TABLE_PREFIX + 'login') // 로그인 테이블 (접속자수)\n`
+	  + `global.g5.set('mail_table', G5_TABLE_PREFIX + 'mail') // 회원메일 테이블\n`
+	  + `global.g5.set('member_table', G5_TABLE_PREFIX + 'member') // 회원 테이블\n`
+	  + `global.g5.set('memo_table', G5_TABLE_PREFIX + 'memo') // 메모 테이블\n`
+	  + `global.g5.set('poll_table', G5_TABLE_PREFIX + 'poll') // 투표 테이블\n`
+	  + `global.g5.set('poll_etc_table', G5_TABLE_PREFIX + 'poll_etc') // 투표 기타의견 테이블\n`
+	  + `global.g5.set('point_table', G5_TABLE_PREFIX + 'point') // 포인트 테이블\n`
+	  + `global.g5.set('popular_table', G5_TABLE_PREFIX + 'popular') // 인기검색어 테이블\n`
+	  + `global.g5.set('scrap_table', G5_TABLE_PREFIX + 'scrap') // 게시글 스크랩 테이블\n`
+	  + `global.g5.set('visit_table', G5_TABLE_PREFIX + 'visit') // 방문자 테이블\n`
+	  + `global.g5.set('visit_sum_table', G5_TABLE_PREFIX + 'visit_sum') // 방문자 합계 테이블\n`
+	  + `global.g5.set('uniqid_table', G5_TABLE_PREFIX + 'uniqid') // 유니크한 값을 만드는 테이블\n`
+	  + `global.g5.set('autosave_table', G5_TABLE_PREFIX + 'autosave') // 게시글 작성시 일정시간마다 글을 임시 저장하는 테이블\n`
+	  + `global.g5.set('cert_history_table', G5_TABLE_PREFIX + 'cert_history') // 인증내역 테이블\n`
+	  + `global.g5.set('qa_config_table', G5_TABLE_PREFIX + 'qa_config') // 1:1문의 설정테이블\n`
+	  + `global.g5.set('qa_content_table', G5_TABLE_PREFIX + 'qa_content') // 1:1문의 테이블\n`
+	  + `global.g5.set('content_table', G5_TABLE_PREFIX + 'content') // 내용(컨텐츠)정보 테이블\n`
+	  + `global.g5.set('faq_table', G5_TABLE_PREFIX + 'faq') // 자주하시는 질문 테이블\n`
+	  + `global.g5.set('faq_master_table', G5_TABLE_PREFIX + 'faq_master') // 자주하시는 질문 마스터 테이블\n`
+	  + `global.g5.set('new_win_table', G5_TABLE_PREFIX + 'new_win') // 새창 테이블\n`
+	  + `global.g5.set('menu_table', G5_TABLE_PREFIX + 'menu') // 메뉴관리 테이블\n`
+	  + `global.g5.set('social_profile_table', G5_TABLE_PREFIX + 'member_social_profiles') // 소셜 로그인 테이블\n\n`
+          + `module.exports = {G5_MYSQL_HOST,G5_MYSQL_USER,G5_MYSQL_PASSWORD,G5_MYSQL_DB}`
+      )
+      fs.chmodSync(file, config.G5_FILE_PERMISSION + '')
+
+      returnData.dbconfigFile = file
+    } catch(err) {
+      returnData.installStep = 3
+      returnData.dbconfigFile = file
+      throw err
+    }
   } catch (err) {
     returnData._status = 'InstallError'
     returnData.err = err
