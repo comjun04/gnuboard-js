@@ -25,11 +25,33 @@ for ($i=0; $i<$ext_cnt; $i++) {
 
   let _g5_path = g5_path(req)
 
-  config({path: _g5_path.path, url: _g5_path.url}) // 설정 파일
+  config({ path: _g5_path.path, url: _g5_path.url }) // 설정 파일
 
   _g5_path = undefined
 
-//==========================================================================================================================
+  /*
+//==============================================================================
+// SQL Injection 등으로 부터 보호를 위해 sql_escape_string() 적용
+//------------------------------------------------------------------------------
+// magic_quotes_gpc 에 의한 backslashes 제거
+if (get_magic_quotes_gpc()) {
+    $_POST    = array_map_deep('stripslashes',  $_POST);
+    $_GET     = array_map_deep('stripslashes',  $_GET);
+    $_COOKIE  = array_map_deep('stripslashes',  $_COOKIE);
+    $_REQUEST = array_map_deep('stripslashes',  $_REQUEST);
+}
+
+// sql_escape_string 적용
+$_POST    = array_map_deep(G5_ESCAPE_FUNCTION,  $_POST);
+$_GET     = array_map_deep(G5_ESCAPE_FUNCTION,  $_GET);
+$_COOKIE  = array_map_deep(G5_ESCAPE_FUNCTION,  $_COOKIE);
+$_REQUEST = array_map_deep(G5_ESCAPE_FUNCTION,  $_REQUEST);
+//==============================================================================
+*/
+
+  
+
+  //==========================================================================================================================
 
   // Global variable define: <root>/globals.js
   //global.member = new Map()
@@ -38,8 +60,7 @@ for ($i=0; $i<$ext_cnt; $i++) {
   return
 }
 
-function g5_path(req)
-{
+function g5_path(req) {
   /*
   let chroot = substr($_SERVER['SCRIPT_FILENAME'], 0, strpos($_SERVER['SCRIPT_FILENAME'], dirname(__FILE__)));
   let result['path'] = str_replace('\\', '/', $chroot.dirname(__FILE__));
@@ -65,15 +86,14 @@ function g5_path(req)
 }
 
 // multi-dimensional array에 사용자지정 함수적용
-function array_map_deep(fn, array)
-{
-  if(Array.isArray(array) || array instanceof Map) {
+function array_map_deep(fn, array) {
+  if (Array.isArray(array) || array instanceof Map) {
     array.forEach((value, key) => {
-      if(Array.isArray(value) || array instanceof Map) {
+      if (Array.isArray(value) || array instanceof Map) {
         if (Array.isArray(value)) array[key] = array_map_deep(fn, value)
         else array.set(key, array_map_deep(fn, value))
       } else {
-        if(Array.isArray(value)) array[key] = fn.call(null, value)
+        if (Array.isArray(value)) array[key] = fn.call(null, value)
         else array.set(key, fn.call(null, value))
       }
     })
@@ -83,5 +103,25 @@ function array_map_deep(fn, array)
 
   return array
 }
+
+/*
+// SQL Injection 대응 문자열 필터링
+function sql_escape_string($str)
+{
+    if(defined('G5_ESCAPE_PATTERN') && defined('G5_ESCAPE_REPLACE')) {
+        $pattern = G5_ESCAPE_PATTERN;
+        $replace = G5_ESCAPE_REPLACE;
+
+        if($pattern)
+            $str = preg_replace($pattern, $replace, $str);
+    }
+
+    $str = call_user_func('addslashes', $str);
+
+    return $str;
+}
+*/
+
+
 
 module.exports = run
