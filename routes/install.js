@@ -5,7 +5,7 @@ const path = require('path').resolve()
 const slash = require('express-slash')
 const fs = require('fs')
 
-const config = require('../config')
+const config = require('../config')()
 const commonLib = require('../script/lib/common.lib')
 const installFunction = require('../script/install/install.function')
 const DB = require('../database')

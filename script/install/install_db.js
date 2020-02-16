@@ -3,7 +3,7 @@ const fs = require('fs')
 
 const PHP = require('../../php')
 const DB = require('../../database')
-const config = require('../../config')
+const config = require('../../config')()
 
 const commonLib = require('../lib/common.lib')
 const urlLib = require('../lib/url.lib')

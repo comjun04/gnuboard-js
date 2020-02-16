@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 
 const PHP = require('../../php')
-const config = require('../../config')
+const config = require('../../config')()
 
 const installInc = require('./install.inc')
 

@@ -1,7 +1,7 @@
 const os = require('os')
 const fs = require('fs')
 
-const config = require('../../config')
+const config = require('../../config')()
 
 function run(data = {}) {
   let data_path = './' + config.G5_DATA_DIR
