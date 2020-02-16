@@ -13,6 +13,7 @@ const indexRouter = require('./routes/index')
 const installRouter = require('./routes/install')
 
 global.appRoot = path.resolve(__dirname)
+global.appPort = 4000 // TODO add this in settings file & remove global
 
 // Database
 let db = DB.create()
@@ -34,7 +35,7 @@ app.use('/', indexRouter)
 app.use(slash())
 app.use('/install/', installRouter)
 
-app.listen(4000, () => {console.log('server started')})
+app.listen(global.appPort, () => {console.log('server started')})
 
 // Custom Functions
 

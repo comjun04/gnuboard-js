@@ -1,7 +1,8 @@
 const knex = require('knex')
 const fs = require('fs')
 
-const config = require('./config')
+const _config = require('./config')
+const config = _config()
 
 let file = `${config.G5_DATA_DIR}/${config.G5_DBCONFIG_FILE}`
 let dbconfig = fs.existsSync(__dirname + '/' + file) ? require('./' + file) : {} // this file can reload
