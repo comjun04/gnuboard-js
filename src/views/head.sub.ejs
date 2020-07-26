@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<% if (session.isMobile) { %>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=0,maximum-scale=10,user-scalable=yes">
+<meta name="HandheldFriendly" content="true">
+<meta name="format-detection" content="telephone=no">
+<% } else { %>
+<meta http-equiv="imagetoolbar" content="no">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<% } %>
+
+<% if(session.config.cf_add_meta) { %>
+<%= session.config.cf_add_meta %>
+<% } %>
+<title><%= session.headTitle %></title>
+<%
+  if (session.isAdmin) {
+    if(session.themePreview) {
+%>
+  <link rel="stylesheet" href="'.run_replace('head_css_url', '/adm/css/admin.css?ver='.G5_CSS_VER, G5_URL).'">
+  <% 
+    }
+  } else {
+  %>
+  <link rel="stylesheet" href="'.run_replace('head_css_url', G5_CSS_URL.'/'.(G5_IS_MOBILE ?'mobile':'default').'.css?ver='.G5_CSS_VER, G5_URL).'">
+  <% } %>
+<!--[if lte IE 8]>
+<script src="<?php echo G5_JS_URL ?>/html5.js"></script>
+<![endif]-->
+<script>
+// 자바스크립트에서 사용하는 전역변수 선언
+//var g5_url       = "<?php echo G5_URL ?>";
+var g5_bbs_url   = "/bbs";
+var g5_is_member = "<?php echo isset($is_member)?$is_member:''; ?>";
+var g5_is_admin  = "<?php echo isset($is_admin)?$is_admin:''; ?>";
+var g5_is_mobile = "<%= session.isMobile %>";
+var g5_bo_table  = "<?php echo isset($bo_table)?$bo_table:''; ?>";
+var g5_sca       = "<?php echo isset($sca)?$sca:''; ?>";
+var g5_editor    = "<?php echo ($config['cf_editor'] && $board['bo_use_dhtml_editor'])?$config['cf_editor']:''; ?>";
+var g5_cookie_domain = "<?php echo G5_COOKIE_DOMAIN ?>";
+<% if(session.isAdmin) { %>
+var g5_admin_url = "/adm";
+<% } %>
+</script>
+<?php
+add_javascript('/js/jquery-1.12.4.min.js', 0);
+add_javascript('/js/jquery-migrate-1.4.1.min.js', 0);
+add_javascript('/js/jquery.menu.js?ver='.G5_JS_VER.'', 0);
+add_javascript('<script src="'.G5_JS_URL.'/common.js?ver='.G5_JS_VER.'"></script>', 0);
+add_javascript('<script src="'.G5_JS_URL.'/wrest.js?ver='.G5_JS_VER.'"></script>', 0);
+add_javascript('<script src="'.G5_JS_URL.'/placeholders.min.js"></script>', 0);
+add_stylesheet('<link rel="stylesheet" href="'.G5_JS_URL.'/font-awesome/css/font-awesome.min.css">', 0);
+
+if(session.isMobile) {
+    add_javascript('<script src="'.G5_JS_URL.'/modernizr.custom.70111.js"></script>', 1); // overflow scroll 감지
+}
+<% if(session.isAdmin) { %><%= session.config.cf_add_script %><% } %>
+
+</head>
+<body><%= session.body_script ? session.body_script : '' %>
+<%
+  if (session.isMember) { // 회원이라면 로그인 중이라는 메세지를 출력해준다.
+    let sr_admin_msg = '';
+    if (session.isAdmin === 'super') sr_admin_msg = "최고관리자 ";
+    else if (session.isAdmin === 'group') sr_admin_msg = "그룹관리자 ";
+    else if (session.isAdmin === 'board') sr_admin_msg = "게시판관리자 ";
+%>
+<div id="hd_login_msg"><%= sr_admin_msg %>get_text($member['mb_nick'])님 로그인 중
+    <a href="/bbs/logout">로그아웃</a>
+    <% } %>
+</div>
+

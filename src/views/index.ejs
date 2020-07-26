@@ -1,0 +1,17 @@
+<%- include('./head.ejs') %>
+
+<h2 class="sound_only">최신글</h2>
+
+<div class="latest_top_wr">
+  <%- include(`./${session.latestArticle.skin}/pic_list/latest.skin.ejs`, { num: 0 }) %>
+  <%- include(`./${session.latestArticle.skin}/pic_list/latest.skin.ejs`, { num: 1 }) %>
+  <%- include(`./${session.latestArticle.skin}/pic_list/latest.skin.ejs`, { num: 2 }) %>
+</div>
+
+<div class="latest_wr">
+  <%- include(`./${session.latestArticle.skin}/pic_block/latest.skin.ejs`, { num: 3 }) %>
+</div>
+
+<div class="latest_wr">
+
+</div>

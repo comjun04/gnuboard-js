@@ -1,0 +1,10 @@
+# Vim swap file
+*.swp
+*.swo
+
+# node_modules
+node_modules
+
+# Configuration
+config.js
+dbconfig.js
