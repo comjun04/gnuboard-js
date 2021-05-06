@@ -8,7 +8,7 @@
     "express-slash": "^2.0.1",
     "knex": "^0.21.2",
     "mysql": "^2.18.1",
-    "sanitize-html": "^1.27.1"
+    "sanitize-html": "^2.3.2"
   },
   "name": "gnuboard-js-r",
   "version": "1.0.0",
